@@ -86,7 +86,7 @@ class RedNose(nose.plugins.Plugin):
 		self._in_test = False
 	
 	def _format_test_name(self, test):
-		return test.shortDescription() or str(test)
+		return test.shortDescription() or unicode(test)
 	
 	def prepareTestResult(self, result):
 		try:
@@ -228,6 +228,8 @@ class RedNose(nose.plugins.Plugin):
 			return termstyle.bold(fullpath[len(here)+1:])
 		return path
 	
+	SRC_HEADER_REGEX = re.compile(r"#\s*-[*]-\s*(.*)\s*-[*]-")
+
 	def _file_line(self, tb):
 		"""formats the file / lineno / function line of a traceback element"""
 		prefix = "file://"
@@ -245,6 +247,16 @@ class RedNose(nose.plugins.Plugin):
 		function_name = f.f_code.co_name
 		
 		line_contents = linecache.getline(filename, lineno, f.f_globals).strip()
+
+		header = linecache.getline(filename, 1).strip()
+		matcher = self.SRC_HEADER_REGEX.search(header)
+		if matcher:
+			kvs = matcher.group(1)
+			kvs = kvs.split(";")
+			kvs = dict([(k.strip(), v.strip()) for k, v in [kvp.split(":") for kvp in kvs]])
+			if "coding" in kvs:
+				self.encoding = encoding = kvs["coding"]
+				line_contents = line_contents.decode(encoding)
 
 		return "    %s line %s in %s\n      %s" % (
 			termstyle.blue(prefix, self._relative_path(filename)),
@@ -265,7 +277,7 @@ class RedNose(nose.plugins.Plugin):
 		return '\n'.join(ret)
 	
 	def _fmt_message(self, exception, color):
-		orig_message_lines = str(exception).splitlines()
+		orig_message_lines = unicode(exception).splitlines()
 
 		if len(orig_message_lines) == 0:
 			return ''
@@ -280,6 +292,7 @@ class RedNose(nose.plugins.Plugin):
 		return '\n'.join(message_lines)
 
 	def _out(self, msg='', newline=False):
+		msg = msg.encode(self.encoding) if hasattr(self, 'encoding') else msg
 		self.stream.write(msg)
 		if newline:
 			self.stream.write('\n')
