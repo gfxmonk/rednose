@@ -44,6 +44,7 @@ line_length = 77
 
 class RedNose(nose.plugins.Plugin):
 	env_opt = 'NOSE_REDNOSE'
+	env_opt_color = 'NOSE_REDNOSE_COLOR'
 	score = 600
 	
 	def __init__(self, *args):
@@ -63,11 +64,12 @@ class RedNose(nose.plugins.Plugin):
 			help="enable colour output")
 		parser.add_option(
 			"--no-color", action="store_false",
+			default=(True if env.get(self.env_opt_color) == 'no' else False),
 			dest="rednose",
 			help="disable colour output")
 		parser.add_option(
 			"--force-color", action="store_true",
-			default=False,
+			default=(True if env.get(self.env_opt_color) == 'force' else False),
 			help="force colour output when not using a TTY")
 		parser.add_option(
 			"--immediate", action="store_true",

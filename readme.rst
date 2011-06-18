@@ -33,6 +33,6 @@ to a file). To control colouring, use one of::
 	nosetests --rednose --force-color
 	nosetests --no-color
 
-(you can also set this in the environment variable NOSE_REDNOSE_COLOR)
+(you can also control this by setting the environment variable NOSE_REDNOSE_COLOR to 'force' or 'no')
 
 .. _nosetests: http://somethingaboutorange.com/mrl/projects/nose/
