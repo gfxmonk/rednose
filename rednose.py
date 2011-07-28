@@ -161,8 +161,8 @@ class RedNose(nose.plugins.Plugin):
 				self._outln()
 		report_num = 0
 		if len(self.reports) > 0:
-			for report_num, report in enumerate(self.reports, 1):
-				self._report_test(report_num, *report)
+			for report_num, report in enumerate(self.reports):
+				self._report_test(report_num + 1, *report)
 			self._outln()
 		
 		self._summarize()
