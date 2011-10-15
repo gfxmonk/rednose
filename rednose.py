@@ -170,7 +170,7 @@ class RedNose(nose.plugins.Plugin):
 	
 	def _summarize(self):
 		"""summarize all tests - the number of failures, errors and successes"""
-		self._line(termstyle.black)
+		self._line(termstyle.default)
 		self._out("%s test%s run in %0.1f seconds" % (
 			self.total,
 			self._plural(self.total),
@@ -197,7 +197,7 @@ class RedNose(nose.plugins.Plugin):
 	
 	def _report_test(self, report_num, type_, test, err):
 		"""report the results of a single (failing or errored) test"""
-		self._line(termstyle.black)
+		self._line(termstyle.default)
 		self._out("%s) " % (report_num))
 		if type_ == failure:
 			color = termstyle.red
