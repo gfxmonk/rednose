@@ -184,7 +184,7 @@ class RedNose(nose.plugins.Plugin):
         """report on all registered failures and errors"""
         self._outln()
         if self.immediate:
-            for x in range(0,5):
+            for x in range(0, 5):
                 self._outln()
         report_num = 0
         if len(self.reports) > 0:
