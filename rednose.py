@@ -192,7 +192,6 @@ class RedNose(nose.plugins.Plugin):
 			self._outln()
 		
 		self._summarize()
-		return False
 	
 	def _summarize(self):
 		"""summarize all tests - the number of failures, errors and successes"""
