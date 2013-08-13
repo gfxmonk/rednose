@@ -28,7 +28,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function
-import os, sys
+import os
+import sys
 import linecache
 import re
 import time
@@ -59,11 +60,12 @@ BLACKLISTED_WRITERS = [
 ]
 REDNOSE_DEBUG = False
 
+
 class RedNose(nose.plugins.Plugin):
 	env_opt = 'NOSE_REDNOSE'
 	env_opt_color = 'NOSE_REDNOSE_COLOR'
-	score = 199 # just under the `coverage` module
-	
+	score = 199  # just under the `coverage` module
+
 	def __init__(self, *args):
 		super(RedNose, self).__init__(*args)
 		self.reports = []
@@ -73,7 +75,7 @@ class RedNose(nose.plugins.Plugin):
 		self.verbose = False
 		self.enabled = False
 		self.tree = False
-	
+
 	def options(self, parser, env=os.environ):
 		global REDNOSE_DEBUG
 		rednose_on = bool(env.get(self.env_opt, False))
@@ -81,23 +83,32 @@ class RedNose(nose.plugins.Plugin):
 		REDNOSE_DEBUG = bool(env.get('REDNOSE_DEBUG', False))
 
 		parser.add_option(
-			"--rednose", action="store_true",
-			default=rednose_on, dest="rednose",
-			help="enable colour output (alternatively, set $%s=1)" % (self.env_opt,))
-		parser.add_option(
-			"--no-color", action="store_false",
+			"--rednose",
+			action="store_true",
+			default=rednose_on,
 			dest="rednose",
-			help="disable colour output")
+			help="enable colour output (alternatively, set $%s=1)" % (self.env_opt,)
+		)
 		parser.add_option(
-			"--force-color", action="store_const",
+			"--no-color",
+			action="store_false",
+			dest="rednose",
+			help="disable colour output"
+		)
+		parser.add_option(
+			"--force-color",
+			action="store_const",
 			dest='rednose_color',
 			default=rednose_color,
 			const='force',
-			help="force colour output when not using a TTY (alternatively, set $%s=force)" % (self.env_opt_color,))
+			help="force colour output when not using a TTY (alternatively, set $%s=force)" % (self.env_opt_color,)
+		)
 		parser.add_option(
-			"--immediate", action="store_true",
+			"--immediate",
+			action="store_true",
 			default=False,
-			help="print errors and failures as they happen, as well as at the end")
+			help="print errors and failures as they happen, as well as at the end"
+		)
 
 	def configure(self, options, conf):
 		if options.rednose:
@@ -110,14 +121,14 @@ class RedNose(nose.plugins.Plugin):
 
 			self.immediate = options.immediate
 			self.verbose = options.verbosity >= 2
-	
+
 	def begin(self):
 		self.start_time = time.time()
 		self._in_test = False
-	
+
 	def _format_test_name(self, test):
 		return test.shortDescription() or to_unicode(test)
-	
+
 	def prepareTestResult(self, result):
 		result.stream = FilteringStream(self.stream, BLACKLISTED_WRITERS)
 
@@ -125,7 +136,7 @@ class RedNose(nose.plugins.Plugin):
 		self._in_test = True
 		if self.verbose:
 			self._out(self._format_test_name(test) + ' ... ')
-	
+
 	def afterTest(self, test):
 		if self._in_test:
 			self.addSkip()
@@ -147,7 +158,7 @@ class RedNose(nose.plugins.Plugin):
 			if self.total % line_length == 0:
 				self._outln()
 		self._in_test = False
-		
+
 	def _add_report(self, report):
 		failure_type, test, err = report
 		self.reports.append(report)
@@ -159,7 +170,7 @@ class RedNose(nose.plugins.Plugin):
 		self.failure += 1
 		self._add_report((failure, test, err))
 		self._print_test(failure, termstyle.red)
-	
+
 	def addError(self, test, err):
 		if err[0].__name__ == 'SkipTest':
 			self.addSkip(test, err)
@@ -167,59 +178,50 @@ class RedNose(nose.plugins.Plugin):
 		self.error += 1
 		self._add_report((error, test, err))
 		self._print_test(error, termstyle.yellow)
-		
+
 	def addSuccess(self, test):
 		self.success += 1
 		self._print_test(success, termstyle.green)
-	
+
 	def addSkip(self, test=None, err=None):
 		self.skip += 1
 		self._print_test(skip, termstyle.blue)
 
 	def setOutputStream(self, stream):
 		self.stream = stream
-	
+
 	def report(self, stream):
 		"""report on all registered failures and errors"""
 		self._outln()
 		if self.immediate:
-			for x in range(0,5):
+			for x in range(0, 5):
 				self._outln()
 		report_num = 0
 		if len(self.reports) > 0:
 			for report_num, report in enumerate(self.reports):
 				self._report_test(report_num + 1, *report)
 			self._outln()
-		
+
 		self._summarize()
-	
+
 	def _summarize(self):
 		"""summarize all tests - the number of failures, errors and successes"""
 		self._line(termstyle.black)
-		self._out("%s test%s run in %0.1f seconds" % (
-			self.total,
-			self._plural(self.total),
-			time.time() - self.start_time))
+		self._out("%s test%s run in %0.1f seconds" % (self.total, self._plural(self.total), time.time() - self.start_time))
 		if self.total > self.success:
 			self._outln(". ")
 			additionals = []
 			if self.failure > 0:
-				additionals.append(termstyle.red("%s FAILED" % (
-					self.failure,)))
+				additionals.append(termstyle.red("%s FAILED" % (self.failure,)))
 			if self.error > 0:
-				additionals.append(termstyle.yellow("%s error%s" % (
-					self.error,
-					self._plural(self.error) )))
+				additionals.append(termstyle.yellow("%s error%s" % (self.error, self._plural(self.error))))
 			if self.skip > 0:
-				additionals.append(termstyle.blue("%s skipped" % (
-					self.skip)))
+				additionals.append(termstyle.blue("%s skipped" % (self.skip)))
 			self._out(', '.join(additionals))
-				
-		self._out(termstyle.green(" (%s test%s passed)" % (
-			self.success,
-			self._plural(self.success) )))
+
+		self._out(termstyle.green(" (%s test%s passed)" % (self.success, self._plural(self.success))))
 		self._outln()
-	
+
 	def _report_test(self, report_num, type_, test, err):
 		"""report the results of a single (failing or errored) test"""
 		self._line(termstyle.black)
@@ -230,16 +232,15 @@ class RedNose(nose.plugins.Plugin):
 		else:
 			color = termstyle.yellow
 			self._outln(color('ERROR: %s' % (self._format_test_name(test),)))
-		
+
 		exc_type, exc_instance, exc_trace = err
-		
-			
+
 		self._outln()
 		self._outln(self._fmt_traceback(exc_trace))
 		self._out(color('   ', termstyle.bold(color(exc_type.__name__)), ": "))
 		self._outln(self._fmt_message(exc_instance, color))
 		self._outln()
-	
+
 	def _relative_path(self, path):
 		"""
 		If path is a child of the current working directory, the relative
@@ -254,11 +255,11 @@ class RedNose(nose.plugins.Plugin):
 		if fullpath.startswith(here):
 			return termstyle.bold(fullpath[len(here)+1:])
 		return path
-	
+
 	def _file_line(self, tb):
 		"""formats the file / lineno / function line of a traceback element"""
 		prefix = "file://"
-		prefix=""
+		prefix = ""
 
 		f = tb.tb_frame
 		if '__unittest' in f.f_globals:
@@ -270,7 +271,7 @@ class RedNose(nose.plugins.Plugin):
 		lineno = tb.tb_lineno
 		linecache.checkcache(filename)
 		function_name = f.f_code.co_name
-		
+
 		line_contents = linecache.getline(filename, lineno, f.f_globals).strip()
 
 		return "    %s line %s in %s\n      %s" % (
@@ -278,7 +279,7 @@ class RedNose(nose.plugins.Plugin):
 			lineno,
 			termstyle.cyan(function_name),
 			line_contents)
-	
+
 	def _fmt_traceback(self, trace):
 		"""format a traceback"""
 		ret = []
@@ -313,10 +314,10 @@ class RedNose(nose.plugins.Plugin):
 
 	def _outln(self, msg=''):
 		self._out(msg, True)
-	
+
 	def _plural(self, num):
 		return '' if num == 1 else 's'
-	
+
 	def _line(self, color=termstyle.reset, char='-'):
 		"""
 		print a line of separator characters (default '-')
@@ -324,21 +325,26 @@ class RedNose(nose.plugins.Plugin):
 		"""
 		self._outln(color(char * line_length))
 
+
 import traceback
 import sys
-# A wrapper for a stream that will filter
-# calls to `write` and `writeln` to ignore calls
-# from blacklisted callers
-# (implemented as a regex on their filename, according
-# to traceback.extract_stack())
-#
-# It's super hacky, but there seems to be no other way
-# to suppress nose's default output
+
+
 class FilteringStream(object):
+	"""
+	A wrapper for a stream that will filter
+	calls to `write` and `writeln` to ignore calls
+	from blacklisted callers
+	(implemented as a regex on their filename, according
+	to traceback.extract_stack())
+
+	It's super hacky, but there seems to be no other way
+	to suppress nose's default output
+	"""
 	def __init__(self, stream, excludes):
 		self.__stream = stream
 		self.__excludes = list(map(re.compile, excludes))
-	
+
 	def __should_filter(self):
 		try:
 			stack = traceback.extract_stack(limit=3)[0]
@@ -346,8 +352,7 @@ class FilteringStream(object):
 			pattern_matches_filename = lambda pattern: pattern.search(filename)
 			should_filter = any(map(pattern_matches_filename, self.__excludes))
 			if REDNOSE_DEBUG:
-				print >> sys.stderr, "REDNOSE_DEBUG: got write call from %s, should_filter = %s" % (
-						filename, should_filter)
+				print >> sys.stderr, "REDNOSE_DEBUG: got write call from %s, should_filter = %s" % (filename, should_filter)
 			return should_filter
 		except StandardError as e:
 			if REDNOSE_DEBUG:
@@ -356,11 +361,13 @@ class FilteringStream(object):
 			return False
 
 	def write(self, *a):
-		if self.__should_filter(): return
+		if self.__should_filter():
+			return
 		return self.__stream.write(*a)
 
 	def writeln(self, *a):
-		if self.__should_filter(): return
+		if self.__should_filter():
+			return
 		return self.__stream.writeln(*a)
 
 	# pass non-known methods through to self.__stream
