@@ -207,28 +207,19 @@ class RedNose(nose.plugins.Plugin):
 	def _summarize(self):
 		"""summarize all tests - the number of failures, errors and successes"""
 		self._line(termstyle.black)
-		self._out("%s test%s run in %0.1f seconds" % (
-			self.total,
-			self._plural(self.total),
-			time.time() - self.start_time))
+		self._out("%s test%s run in %0.1f seconds" % (self.total, self._plural(self.total), time.time() - self.start_time))
 		if self.total > self.success:
 			self._outln(". ")
 			additionals = []
 			if self.failure > 0:
-				additionals.append(termstyle.red("%s FAILED" % (
-					self.failure,)))
+				additionals.append(termstyle.red("%s FAILED" % (self.failure,)))
 			if self.error > 0:
-				additionals.append(termstyle.yellow("%s error%s" % (
-					self.error,
-					self._plural(self.error) )))
+				additionals.append(termstyle.yellow("%s error%s" % (self.error, self._plural(self.error))))
 			if self.skip > 0:
-				additionals.append(termstyle.blue("%s skipped" % (
-					self.skip)))
+				additionals.append(termstyle.blue("%s skipped" % (self.skip)))
 			self._out(', '.join(additionals))
-				
-		self._out(termstyle.green(" (%s test%s passed)" % (
-			self.success,
-			self._plural(self.success) )))
+
+		self._out(termstyle.green(" (%s test%s passed)" % (self.success, self._plural(self.success))))
 		self._outln()
 
 	def _report_test(self, report_num, type_, test, err):
@@ -361,8 +352,7 @@ class FilteringStream(object):
 			pattern_matches_filename = lambda pattern: pattern.search(filename)
 			should_filter = any(map(pattern_matches_filename, self.__excludes))
 			if REDNOSE_DEBUG:
-				print >> sys.stderr, "REDNOSE_DEBUG: got write call from %s, should_filter = %s" % (
-						filename, should_filter)
+				print >> sys.stderr, "REDNOSE_DEBUG: got write call from %s, should_filter = %s" % (filename, should_filter)
 			return should_filter
 		except StandardError as e:
 			if REDNOSE_DEBUG:
