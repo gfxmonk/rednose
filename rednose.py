@@ -33,7 +33,7 @@ import sys
 import linecache
 import re
 import time
-import colorama.initialize
+import colorama.initialise
 
 import nose
 
@@ -195,7 +195,7 @@ class RedNose(nose.plugins.Plugin):
 		self._print_test(skip, termstyle.blue)
 
 	def setOutputStream(self, stream):
-		self.stream = colorama.initialize.wrap_stream(stream, True, False, False, True)
+		self.stream = colorama.initialise.wrap_stream(stream, True, False, False, True)
 
 	def report(self, stream):
 		"""report on all registered failures and errors"""
