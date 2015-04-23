@@ -14,7 +14,7 @@ setup(
 	name='rednose',
 	py_modules=['rednose'],
 	url='http://gfxmonk.net/dist/0install/rednose.xml',
-	version='0.4.1',
+	version='0.4.1-mearns',
 classifiers=[
 		"License :: OSI Approved :: BSD License",
 		"Programming Language :: Python",
